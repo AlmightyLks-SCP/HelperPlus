@@ -24,14 +24,26 @@ namespace HelperPlus.Services
         {
             _isUnix = IsUnix();
             ProcessId = processId;
+            SetUpBackgroundWorker();
+        }
+
+        public void DeconstructBackgroundWorker()
+        {
+            BackgroundWorker.DoWork -= BackgroundWorker_DoWork;
+            BackgroundWorker.RunWorkerCompleted -= BackgroundWorker_RunWorkerCompleted;
+            BackgroundWorker.Dispose();
+        }
+        public void SetUpBackgroundWorker()
+        {
             BackgroundWorker = new BackgroundWorker();
+            BackgroundWorker.WorkerSupportsCancellation = true;
             BackgroundWorker.DoWork += BackgroundWorker_DoWork;
             BackgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
         }
 
         private async void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Cancelled)
+            if (e.Cancelled || BackgroundWorker.CancellationPending)
             {
                 return;
             }
@@ -40,9 +52,15 @@ namespace HelperPlus.Services
         }
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            if (BackgroundWorker.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             CurrentTotalMetrics = GetMetrics();
             CurrentProcessRamUsage = GetProcessRamUsage();
         }
+
         private MemoryMetrics GetMetrics()
         {
             if (_isUnix)
@@ -61,12 +79,14 @@ namespace HelperPlus.Services
 
             return GetWindowsProcessRamUsage();
         }
+
         private bool IsUnix()
         {
             var isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
                          RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             return isUnix;
         }
+
         private MemoryMetrics GetWindowsTotalMetrics()
         {
             var output = "";
@@ -126,6 +146,7 @@ namespace HelperPlus.Services
 
             return metrics;
         }
+
         private double GetWindowsProcessRamUsage()
         {
             var output = "";

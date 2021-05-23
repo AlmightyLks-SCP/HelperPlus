@@ -1,19 +1,12 @@
-﻿using HarmonyLib;
-using HelperPlus.Configs;
+﻿using HelperPlus.Configs;
 using HelperPlus.Handlers;
 using HelperPlus.Services;
 using Hints;
 using MEC;
 using Synapse.Api;
 using Synapse.Api.Plugin;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace HelperPlus
 {
@@ -48,13 +41,15 @@ namespace HelperPlus
 
             PlayerUIHandles = new Dictionary<Player, CoroutineHandle>();
             _handler = new HelperHandler();
-            _richTextBuilder = new RichTextBuilder(Config, _handler, _memoryService);
+            _richTextBuilder = new RichTextBuilder(this, _handler, _memoryService);
         }
         public override void ReloadConfigs()
         {
             if (_memoryService.BackgroundWorker.IsBusy)
             {
                 _memoryService.BackgroundWorker.CancelAsync();
+                _memoryService.DeconstructBackgroundWorker();
+                _memoryService.SetUpBackgroundWorker();
             }
 
             //Only run if memory is going to be asked for

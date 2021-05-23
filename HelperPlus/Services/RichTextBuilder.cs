@@ -21,13 +21,13 @@ namespace HelperPlus.Services
 
         private HelperHandler _handler;
         private MemoryService _memoryService;
-        private HelperConfig _config;
+        private HelperPlus _helperPlus;
 
-        public RichTextBuilder(HelperConfig config, HelperHandler handler, MemoryService memoryService)
+        public RichTextBuilder(HelperPlus helperPlus, HelperHandler handler, MemoryService memoryService)
         {
+            _helperPlus = helperPlus;
             _handler = handler;
             _memoryService = memoryService;
-            _config = config;
             SectionColours = new Dictionary<string, string>()
             {
                 { "Environment", "#51d400" },
@@ -41,38 +41,34 @@ namespace HelperPlus.Services
         {
             try
             {
-                //Stopwatch watch = Stopwatch.StartNew();
                 StringBuilder builder = new StringBuilder();
                 short appendedLines = 0;
                 builder.Append("<voffset=35em>");
-                if (_config.Environment.Enabled)
+                if (_helperPlus.Config.Environment.Enabled)
                 {
                     AddEnvironmentSection(builder, player);
                 }
                 builder.AppendLine();
-                if (_config.Server.Enabled)
+                if (_helperPlus.Config.Server.Enabled)
                 {
                     AddServerSection(builder);
                 }
                 builder.AppendLine();
-                if (_config.Map.Enabled)
+                if (_helperPlus.Config.Map.Enabled)
                 {
                     AddMapSection(builder);
                 }
                 builder.AppendLine();
-                if (_config.Items.Enabled)
+                if (_helperPlus.Config.Items.Enabled)
                 {
                     AddItemsSection(builder);
                 }
                 builder.Append("</voffset>");
-
-                //watch.Stop();
-                //Synapse.Api.Logger.Get.Warn($"{watch.Elapsed.TotalMilliseconds} ms");
                 return builder.ToString();
             }
             catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Warn(e);
+                Synapse.Api.Logger.Get.Error(e);
             }
             return "";
         }
@@ -86,19 +82,19 @@ namespace HelperPlus.Services
 
             builder.Append($"<size={TextSize}%>");
 
-            if (_config.Items.DisplayTotalItems)
+            if (_helperPlus.Config.Items.DisplayTotalItems)
             {
                 builder.AppendLine($"Total Item Amount: {Map.Get.Items.Count}");
             }
-            if (_config.Items.DisplayWeaponAmount)
+            if (_helperPlus.Config.Items.DisplayWeaponAmount)
             {
                 builder.AppendLine($"Weapon Amount: {Map.Get.Items.Count(item => item?.ItemCategory == ItemCategory.Weapon)}");
             }
-            if (_config.Items.DisplayGrenadeAmount)
+            if (_helperPlus.Config.Items.DisplayGrenadeAmount)
             {
                 builder.AppendLine($"Grenade Amount: {Map.Get.Items.Count(item => item?.ItemCategory == ItemCategory.Grenade)}");
             }
-            if (_config.Items.DisplayMedicalAmount)
+            if (_helperPlus.Config.Items.DisplayMedicalAmount)
             {
                 builder.AppendLine($"Medical Amount: {Map.Get.Items.Count(item => item?.ItemCategory == ItemCategory.Medical)}");
             }
@@ -112,15 +108,15 @@ namespace HelperPlus.Services
 
             builder.Append($"<size={TextSize}%>");
 
-            if (_config.Map.DisplayDoorAmount)
+            if (_helperPlus.Config.Map.DisplayDoorAmount)
             {
                 builder.AppendLine($"Door Amount: {Map.Get.Doors.Count}");
             }
-            if (_config.Map.DisplayRoomAmount)
+            if (_helperPlus.Config.Map.DisplayRoomAmount)
             {
                 builder.AppendLine($"Room Amount: {Map.Get.Rooms.Count}");
             }
-            if (_config.Map.DisplayRagdollAmount)
+            if (_helperPlus.Config.Map.DisplayRagdollAmount)
             {
                 builder.AppendLine($"Ragdoll Amount: {Map.Get.Ragdolls.Count}");
             }
@@ -135,18 +131,18 @@ namespace HelperPlus.Services
             builder.Append($"<size={TextSize}%>");
 
             //builder.Append($"<margin-left=5em>{raycastHit.point}\n{raycastHit.point}\n<margin-left=1em>{raycastHit.point}\nTest");
-            if (_config.Server.DisplayServerFps)
+            if (_helperPlus.Config.Server.DisplayServerFps)
             {
                 builder.AppendLine($"FPS: {_handler.ServerFps:.##}");
             }
-            if (_config.Server.DisplayTotalRamUsage || _config.Server.DisplaySLRamUsage)
+            if (_helperPlus.Config.Server.DisplayTotalRamUsage || _helperPlus.Config.Server.DisplaySLRamUsage)
             {
                 MemoryMetrics metrics = _memoryService.CurrentTotalMetrics;
-                if (_config.Server.DisplayTotalRamUsage)
+                if (_helperPlus.Config.Server.DisplayTotalRamUsage)
                 {
                     builder.AppendLine($"Total Ram Usage: {metrics.Used}/{metrics.Total} MB [{((metrics.Used / metrics.Total) * 100):.##}%]");
                 }
-                if (_config.Server.DisplaySLRamUsage)
+                if (_helperPlus.Config.Server.DisplaySLRamUsage)
                 {
                     double slRamUsage = _memoryService.CurrentProcessRamUsage;
                     builder.AppendLine($"SL Ram Usage: {slRamUsage}/{metrics.Total} MB [{((slRamUsage / metrics.Total) * 100):.##}%]");
@@ -170,22 +166,22 @@ namespace HelperPlus.Services
             builder.Append($"<size={TextSize}%>");
 
             //builder.Append($"<margin-left=5em>{raycastHit.point}\n{raycastHit.point}\n<margin-left=1em>{raycastHit.point}\nTest");
-            if (_config.Environment.DisplayTargetPosition)
+            if (_helperPlus.Config.Environment.DisplayTargetPosition)
             {
                 Room targetRoom = Map.Get.Rooms.OrderBy(room => Vector3.Distance(raycastHit.point, room.Position)).FirstOrDefault();
                 builder.AppendLine($"Target Position: {(didRaycastHit ? raycastHit.point.ToString() : "None")}");
                 builder.AppendLine($"Target MapPoint: {(didRaycastHit ? new MapPoint(targetRoom, raycastHit.point).ToString() : "None")}");
             }
-            if (_config.Environment.DisplayTargetName)
+            if (_helperPlus.Config.Environment.DisplayTargetName)
             {
                 builder.AppendLine($"Target Name: {(didRaycastHit ? raycastHit.transform.gameObject.name : "None")}");
             }
-            if (_config.Environment.DisplayPosition)
+            if (_helperPlus.Config.Environment.DisplayPosition)
             {
                 builder.AppendLine($"Player Position: {player.Position}");
                 builder.AppendLine($"Player MapPoint: {(didRaycastHit ? player.MapPoint.ToString() : "None")}");
             }
-            if (_config.Environment.DisplayCurrentRoom)
+            if (_helperPlus.Config.Environment.DisplayCurrentRoom)
             {
                 builder.AppendLine($"Current Room Name: {player.Room.RoomName}");
                 builder.AppendLine($"Current Room Type: {player.Room.RoomType}");
