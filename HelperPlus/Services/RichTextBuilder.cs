@@ -42,7 +42,7 @@ namespace HelperPlus.Services
             try
             {
                 StringBuilder builder = new StringBuilder();
-                short appendedLines = 0;
+
                 builder.Append("<voffset=35em>");
                 if (_helperPlus.Config.Environment.Enabled)
                 {
@@ -162,29 +162,46 @@ namespace HelperPlus.Services
                 out RaycastHit raycastHit,
                 100f
             );
+            Room targetRoom = Map.Get.Rooms.OrderBy(room => Vector3.Distance(raycastHit.point, room.Position)).FirstOrDefault();
+
 
             builder.Append($"<size={TextSize}%>");
 
-            //builder.Append($"<margin-left=5em>{raycastHit.point}\n{raycastHit.point}\n<margin-left=1em>{raycastHit.point}\nTest");
             if (_helperPlus.Config.Environment.DisplayTargetPosition)
             {
-                Room targetRoom = Map.Get.Rooms.OrderBy(room => Vector3.Distance(raycastHit.point, room.Position)).FirstOrDefault();
-                builder.AppendLine($"Target Position: {(didRaycastHit ? raycastHit.point.ToString() : "None")}");
-                builder.AppendLine($"Target MapPoint: {(didRaycastHit ? new MapPoint(targetRoom, raycastHit.point).ToString() : "None")}");
+                bool isValidPlayer = player != null && player.RoleType != RoleType.Spectator && player.RoleType != RoleType.None;
+
+                string targetPosition = didRaycastHit ? raycastHit.point.ToString() : "None";
+                string targetMapPoint = didRaycastHit && isValidPlayer && targetRoom != null ? new MapPoint(targetRoom, raycastHit.point).ToString() : "None";
+
+                builder.AppendLine($"Target Position: {targetPosition}");
+                builder.AppendLine($"Target MapPoint: {targetMapPoint}");
             }
             if (_helperPlus.Config.Environment.DisplayTargetName)
             {
-                builder.AppendLine($"Target Name: {(didRaycastHit ? raycastHit.transform.gameObject.name : "None")}");
+                string targetName = didRaycastHit ? raycastHit.transform.gameObject.name : "None";
+
+                builder.AppendLine($"Target Name: {targetName}");
             }
             if (_helperPlus.Config.Environment.DisplayPosition)
             {
-                builder.AppendLine($"Player Position: {player.Position}");
-                builder.AppendLine($"Player MapPoint: {(didRaycastHit ? player.MapPoint.ToString() : "None")}");
+                bool isValidPlayer = player != null && player.RoleType != RoleType.Spectator && player.RoleType != RoleType.None;
+                string playerPosition = isValidPlayer ? player.Position.ToString() : "None";
+                string playerMapPoint = isValidPlayer ? player.MapPoint.ToString() : "None";
+
+                builder.AppendLine($"Player Position: {playerPosition}");
+                builder.AppendLine($"Player MapPoint: {playerMapPoint}");
             }
             if (_helperPlus.Config.Environment.DisplayCurrentRoom)
             {
-                builder.AppendLine($"Current Room Name: {player.Room.RoomName}");
-                builder.AppendLine($"Current Room Type: {player.Room.RoomType}");
+                bool isValidPlayer = player != null && player.RoleType != RoleType.Spectator && player.RoleType != RoleType.None;
+                Room room = player?.Room;
+
+                string currentRoomName = (isValidPlayer && room != null ? player.Room.RoomName : "None");
+                string currentRoomType = (isValidPlayer && room != null ? player.Room.RoomType.ToString() : "None");
+
+                builder.AppendLine($"Current Room Name: {currentRoomName}");
+                builder.AppendLine($"Current Room Type: {currentRoomType}");
             }
         }
     }
