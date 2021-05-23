@@ -7,7 +7,7 @@ namespace HelperPlus.Commands
     [CommandInformation(
         Name = "phelper",
         Aliases = new string[0],
-        Description = "Plugin UI helper",
+        Description = "Toggle a UI for plugin debugging",
         Permission = "helperplus.phelper",
         Platforms = new[] { Platform.RemoteAdmin },
         Usage = "\"phelper\" to toggle UI"
