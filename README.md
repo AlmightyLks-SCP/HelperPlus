@@ -1,5 +1,7 @@
 # HelperPlus
-A plugin helping out devs debugging their own plugins and servers
+A plugin helping out devs debugging their own plugins and servers.  
+The UI updates ca. twice a second.  
+The ram usage may be inaccurate to a degree because of how the way windows allocates memory per-process, see [here](https://docs.microsoft.com/en-us/windows/win32/memory/working-set).
 
 ---
 
