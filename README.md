@@ -10,6 +10,7 @@ The ram usage may be inaccurate to a degree because of how the way windows alloc
 | Name | Description | Usage | Console Type | Permission  | 
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | pHelper | Toggle a UI for plugin debugging | "phelper" | Remote Admin | helperplus.phelper
+| clear | Clear items, ragdolls and/or dummies | "clear [all/ragdolls/items/dummies]" | Remote Admin | helperplus.clear
 
 ---
 
@@ -44,6 +45,7 @@ map:
   displayDoorAmount: false
   displayRoomAmount: false
   displayRagdollAmount: false
+  displayDummyAmount: false
 }
 ```
 
