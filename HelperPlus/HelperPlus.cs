@@ -62,14 +62,20 @@ namespace HelperPlus
         {
             for (; ; )
             {
-                Hint hint = new TextHint(
-                    _richTextBuilder.BuildRichText(player),
-                    new HintParameter[] { new StringHintParameter(string.Empty) },
-                    null,
-                    0.75f
-                    );
-
-                player.gameObject.GetComponent<ReferenceHub>().hints.Show(hint);
+                try
+                {
+                    Hint hint = new TextHint(
+                        _richTextBuilder.BuildRichText(player),
+                        new HintParameter[] { new StringHintParameter(string.Empty) },
+                        null,
+                        0.75f
+                        );
+                    player.gameObject.GetComponent<ReferenceHub>().hints.Show(hint);
+                }
+                catch (System.Exception e)
+                {
+                    Synapse.Api.Logger.Get.Error(e);
+                }
 
                 yield return Timing.WaitForSeconds(0.5f);
             }

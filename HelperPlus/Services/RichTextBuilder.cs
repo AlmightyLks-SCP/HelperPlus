@@ -105,7 +105,7 @@ namespace HelperPlus.Services
             builder.Append($"<color={SectionColours["Map"]}>");
             builder.Append($"<align=\"left\">");
             builder.AppendLine($"<b>Map</b>");
-
+            
             builder.Append($"<size={TextSize}%>");
 
             if (_helperPlus.Config.Map.DisplayDoorAmount)
@@ -119,6 +119,10 @@ namespace HelperPlus.Services
             if (_helperPlus.Config.Map.DisplayRagdollAmount)
             {
                 builder.AppendLine($"Ragdoll Amount: {Map.Get.Ragdolls.Count}");
+            }
+            if (_helperPlus.Config.Map.DisplayDummyAmount)
+            {
+                builder.AppendLine($"Dummy Amount: {Map.Get.Dummies.Count}");
             }
         }
         private void AddServerSection(StringBuilder builder)
