@@ -1,3 +1,8 @@
+# OUTDATED
+This Plugin was intended for Synapse 2, and is not made, nor compatible with Synapse3.
+
+---
+
 # HelperPlus
 A plugin helping out devs debugging their own plugins and servers.  
 The UI updates ca. twice a second.  
